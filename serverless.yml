@@ -3,6 +3,13 @@ service: api-management
 provider:
   name: aws
   runtime: nodejs14.x
+  iamRoleStatement:
+    - Effect: Allow
+      Action:
+        - apigateway:GET
+        - apigateway:POST
+      Resource:
+        - arn:aws:apigateway:${self:provider.region}::/*
 
   #podemos chamar json dentro do arquivo yml
   #vamos chamar o array json pra dentro do serverless pra ele criar as
@@ -45,3 +52,17 @@ functions:
           path: hello
           method: get
           private: true
+
+  getUsage:
+    handler: handler.usage
+    events:
+      - http:
+          path: getUsage
+          method: get
+
+  getUsagePlans:
+    handler: handler.usagePlans
+    events:
+      - http:
+          path: getUsagePlans
+          method: get

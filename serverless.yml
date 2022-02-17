@@ -1,0 +1,47 @@
+service: api-management
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+  #podemos chamar json dentro do arquivo yml
+  #vamos chamar o array json pra dentro do serverless pra ele criar as
+  #api keys automaticamente
+  apiKeys:
+    - free: ${file(./default-customers.js):private}
+    #aqui podemos setar manualmente, os usuários que pagam
+    - paid:
+        - myPaidKey
+        - zezinho@ze.com
+  usagePlan:
+    - free:
+        quota:
+          limit: 5
+          period: MONTH
+        throttle:
+          burstLimit: 200
+          #quantidade por segundo
+          rateLimit: 200
+
+    - paid:
+        quota:
+          limit: 1000
+          period: DAY
+        throttle:
+          burstLimit: 400
+          rateLimit: 50
+
+package:
+  excludeDevDependencies: true
+
+plugins:
+  - serverless-offline
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          private: true
